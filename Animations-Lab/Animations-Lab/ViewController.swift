@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var duration = 1.0
+    var stepDuration = 7.0
     
     lazy var blueSquare: UIView = {
         let view = UIView()
@@ -47,10 +47,12 @@ class ViewController: UIViewController {
     
     lazy var timeStepper: UIStepper = {
         let stepper = UIStepper()
-        stepper.minimumValue = 0
-        stepper.maximumValue = 9
+        stepper.minimumValue = 0.0
+        stepper.maximumValue = 9.0
         stepper.stepValue = 1.0
-        duration = stepper.value
+        stepDuration = stepper.value
+        stepper.addTarget(self, action: #selector(stepUp(sender:)), for: .touchUpInside)
+        print(stepDuration)
         return stepper
     }()
     
@@ -76,10 +78,14 @@ class ViewController: UIViewController {
         configureConstraints()
     }
     
+    @IBAction func stepUp(sender: UIStepper) {
+        stepDuration = sender.value
+    }
+    
     @IBAction func animateSquareUp(sender: UIButton) {
         let oldOffset = blueSquareCenterYConstraint.constant
         blueSquareCenterYConstraint.constant = oldOffset - 150
-        UIView.animate(withDuration: duration) { [unowned self] in
+        UIView.animate(withDuration: stepDuration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
@@ -87,7 +93,7 @@ class ViewController: UIViewController {
     @IBAction func animateSquareDown(sender: UIButton) {
         let oldOffet = blueSquareCenterYConstraint.constant
         blueSquareCenterYConstraint.constant = oldOffet + 150
-        UIView.animate(withDuration: duration) { [unowned self] in
+        UIView.animate(withDuration: stepDuration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
