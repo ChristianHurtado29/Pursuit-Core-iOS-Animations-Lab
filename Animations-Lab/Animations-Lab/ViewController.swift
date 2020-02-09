@@ -10,6 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    var duration = 1.0
+    
     lazy var blueSquare: UIView = {
         let view = UIView()
         view.backgroundColor = .blue
@@ -43,6 +45,15 @@ class ViewController: UIViewController {
         return button
     }()
     
+    lazy var timeStepper: UIStepper = {
+        let stepper = UIStepper()
+        stepper.minimumValue = 0
+        stepper.maximumValue = 9
+        stepper.stepValue = 1.0
+        duration = stepper.value
+        return stepper
+    }()
+    
     lazy var blueSquareHeightConstaint: NSLayoutConstraint = {
         blueSquare.heightAnchor.constraint(equalToConstant: 200)
     }()
@@ -68,7 +79,7 @@ class ViewController: UIViewController {
     @IBAction func animateSquareUp(sender: UIButton) {
         let oldOffset = blueSquareCenterYConstraint.constant
         blueSquareCenterYConstraint.constant = oldOffset - 150
-        UIView.animate(withDuration: 2) { [unowned self] in
+        UIView.animate(withDuration: duration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
@@ -76,7 +87,7 @@ class ViewController: UIViewController {
     @IBAction func animateSquareDown(sender: UIButton) {
         let oldOffet = blueSquareCenterYConstraint.constant
         blueSquareCenterYConstraint.constant = oldOffet + 150
-        UIView.animate(withDuration: 2) { [unowned self] in
+        UIView.animate(withDuration: duration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
@@ -85,6 +96,7 @@ class ViewController: UIViewController {
         view.addSubview(blueSquare)
         addStackViewSubviews()
         view.addSubview(buttonStackView)
+        view.addSubview(timeStepper)
     }
     
     private func addStackViewSubviews() {
@@ -97,6 +109,16 @@ class ViewController: UIViewController {
         constrainUpButton()
         constrainDownButton()
         constrainButtonStackView()
+        contrainStepper()
+    }
+    
+    private func contrainStepper() {
+        timeStepper.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            timeStepper.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            timeStepper.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
     }
     
     private func constrainUpButton() {
