@@ -27,6 +27,15 @@ class ViewController: UIViewController {
         return buttonStack
     }()
     
+    lazy var leftRightStackView: UIStackView = {
+        let buttonStack = UIStackView()
+            buttonStack.axis = .horizontal
+            buttonStack.alignment = .center
+            buttonStack.distribution = .equalSpacing
+            buttonStack.spacing = 30
+            return buttonStack
+        }()
+    
     lazy var upButton: UIButton = {
        let button = UIButton()
         button.setTitle("Move square up", for: .normal)
@@ -45,6 +54,24 @@ class ViewController: UIViewController {
         return button
     }()
     
+    lazy var leftButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Move square left", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.backgroundColor = .gray
+        button.addTarget(self, action: #selector(animateSquareLeft(sender:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var rightButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Move square right", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.backgroundColor = .gray
+        button.addTarget(self, action: #selector(animateSquareRight(sender:)), for: .touchUpInside)
+        return button
+    }()
+    
     lazy var timeStepper: UIStepper = {
         let stepper = UIStepper()
         stepper.minimumValue = 0.0
@@ -52,7 +79,6 @@ class ViewController: UIViewController {
         stepper.stepValue = 1.0
         stepDuration = stepper.value
         stepper.addTarget(self, action: #selector(stepUp(sender:)), for: .touchUpInside)
-        print(stepDuration)
         return stepper
     }()
     
@@ -98,16 +124,41 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func animateSquareLeft(sender: UIButton) {
+        let oldOffset = blueSquareCenterXConstraint.constant
+        blueSquareCenterXConstraint.constant = oldOffset - 150
+        UIView.animate(withDuration: stepDuration) { [unowned self] in
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @IBAction func animateSquareRight(sender: UIButton) {
+        let oldOffset = blueSquareCenterXConstraint.constant
+        blueSquareCenterXConstraint.constant = oldOffset + 150
+        UIView.animate(withDuration: stepDuration) { [unowned self] in
+            self.view.layoutIfNeeded()
+        }
+    }
+    
     private func addSubviews() {
         view.addSubview(blueSquare)
         addStackViewSubviews()
         view.addSubview(buttonStackView)
         view.addSubview(timeStepper)
+        addLeftRightSubviews()
+        view.addSubview(leftRightStackView)
     }
     
     private func addStackViewSubviews() {
         buttonStackView.addSubview(upButton)
         buttonStackView.addSubview(downButton)
+        
+    }
+    
+    private func addLeftRightSubviews() {
+        leftRightStackView.addSubview(rightButton)
+        leftRightStackView.addSubview(leftButton)
+        
     }
     
     private func configureConstraints() {
@@ -116,6 +167,9 @@ class ViewController: UIViewController {
         constrainDownButton()
         constrainButtonStackView()
         contrainStepper()
+        constrainLeftButton()
+        constrainRightButton()
+        constrainLeftRightStackView()
     }
     
     private func contrainStepper() {
@@ -138,6 +192,18 @@ class ViewController: UIViewController {
         downButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
     
+    private func constrainLeftButton() {
+        leftButton.translatesAutoresizingMaskIntoConstraints = false
+        leftButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+    }
+    
+    private func constrainRightButton() {
+        rightButton.translatesAutoresizingMaskIntoConstraints = false
+        rightButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        rightButton.trailingAnchor.constraint(equalTo: leftRightStackView.trailingAnchor).isActive = true
+    }
+    
+    
     private func constrainBlueSquare() {
         blueSquare.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -155,6 +221,16 @@ class ViewController: UIViewController {
             buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
             buttonStackView.heightAnchor.constraint(equalToConstant: 50),
             buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor),
+        ])
+    }
+    
+    private func constrainLeftRightStackView() {
+        leftRightStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            leftRightStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            leftRightStackView.bottomAnchor.constraint(equalTo: buttonStackView.topAnchor, constant: -10),
+            leftRightStackView.heightAnchor.constraint(equalToConstant: 50),
+            leftRightStackView.widthAnchor.constraint(equalTo: view.widthAnchor),
         ])
     }
 }
