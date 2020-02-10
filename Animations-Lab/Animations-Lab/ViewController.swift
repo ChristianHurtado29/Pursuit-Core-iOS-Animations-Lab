@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     var stepDuration = 7.0
+    var stepDistance = 150.0
     
     lazy var blueSquare: UIView = {
         let view = UIView()
@@ -82,6 +83,17 @@ class ViewController: UIViewController {
         return stepper
     }()
     
+    lazy var distanceStepper: UIStepper = {
+        let stepper = UIStepper()
+        stepper.minimumValue = 0
+        stepper.maximumValue = 300
+        stepper.stepValue = 10
+        stepDistance = stepper.value
+        stepper.addTarget(self, action: #selector(distanceUp(sender:)), for: .touchUpInside)
+        return stepper
+    }()
+    
+    
     lazy var blueSquareHeightConstaint: NSLayoutConstraint = {
         blueSquare.heightAnchor.constraint(equalToConstant: 200)
     }()
@@ -108,9 +120,13 @@ class ViewController: UIViewController {
         stepDuration = sender.value
     }
     
+    @IBAction func distanceUp(sender: UIStepper) {
+        stepDistance = sender.value
+    }
+    
     @IBAction func animateSquareUp(sender: UIButton) {
         let oldOffset = blueSquareCenterYConstraint.constant
-        blueSquareCenterYConstraint.constant = oldOffset - 150
+        blueSquareCenterYConstraint.constant = oldOffset - CGFloat(stepDistance)
         UIView.animate(withDuration: stepDuration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
@@ -118,7 +134,7 @@ class ViewController: UIViewController {
     
     @IBAction func animateSquareDown(sender: UIButton) {
         let oldOffet = blueSquareCenterYConstraint.constant
-        blueSquareCenterYConstraint.constant = oldOffet + 150
+        blueSquareCenterYConstraint.constant = oldOffet + CGFloat(stepDistance)
         UIView.animate(withDuration: stepDuration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
@@ -126,7 +142,7 @@ class ViewController: UIViewController {
     
     @IBAction func animateSquareLeft(sender: UIButton) {
         let oldOffset = blueSquareCenterXConstraint.constant
-        blueSquareCenterXConstraint.constant = oldOffset - 150
+        blueSquareCenterXConstraint.constant = oldOffset - CGFloat(stepDistance)
         UIView.animate(withDuration: stepDuration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
@@ -134,7 +150,7 @@ class ViewController: UIViewController {
     
     @IBAction func animateSquareRight(sender: UIButton) {
         let oldOffset = blueSquareCenterXConstraint.constant
-        blueSquareCenterXConstraint.constant = oldOffset + 150
+        blueSquareCenterXConstraint.constant = oldOffset + CGFloat(stepDistance)
         UIView.animate(withDuration: stepDuration) { [unowned self] in
             self.view.layoutIfNeeded()
         }
@@ -147,6 +163,7 @@ class ViewController: UIViewController {
         view.addSubview(timeStepper)
         addLeftRightSubviews()
         view.addSubview(leftRightStackView)
+        view.addSubview(distanceStepper)
     }
     
     private func addStackViewSubviews() {
@@ -170,15 +187,23 @@ class ViewController: UIViewController {
         constrainLeftButton()
         constrainRightButton()
         constrainLeftRightStackView()
+        constrainDistanceStepper()
     }
     
     private func contrainStepper() {
         timeStepper.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             timeStepper.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            timeStepper.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            timeStepper.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant:  -150)
         ])
-        
+    }
+    
+    private func constrainDistanceStepper() {
+        distanceStepper.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            distanceStepper.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            distanceStepper.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 150)
+        ])
     }
     
     private func constrainUpButton() {
